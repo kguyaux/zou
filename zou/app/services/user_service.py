@@ -346,10 +346,16 @@ def check_manager_project_access(project_id):
 
 def check_playlist_access(playlist):
     check_project_access(playlist["project_id"])
-    is_manager = permissions.has_manager_permissions()
-    is_client = permissions.has_manager_permissions()
-    has_client_access = is_client and playlist["for_client"]
-    if not is_manager and not has_client_access:
+    ## modified for submarine-studios.. Animators must have permission to make
+    ## playlists:
+    # is_manager = permissions.has_manager_permissions()
+    # is_client = permissions.has_manager_permissions()
+    # has_client_access = is_client and playlist["for_client"]
+    has_client_access = playlist["for_client"]
+    ## modified for submarine-studios.. Animators must have permission to make
+    ## playlists:
+    #if not is_manager and not has_client_access:
+    if not has_client_access:
         raise permissions.PermissionDenied
     return True
 
