@@ -151,7 +151,10 @@ def get_assets_and_tasks(criterions={}, page=1):
         query = query.filter(Entity.project_id == criterions["project_id"])
 
     if "episode_id" in criterions:
-        query = query.filter(Entity.source_id == criterions["episode_id"])
+        if criterions["episode_id"] == "main":
+            query = query.filter(Entity.source_id == None)
+        elif criterions["episode_id"] != "all":
+            query = query.filter(Entity.source_id == criterions["episode_id"])
 
     for (
         asset,
@@ -458,6 +461,8 @@ def create_asset(
     """
     project = projects_service.get_project_raw(project_id)
     asset_type = get_asset_type_raw(asset_type_id)
+    if source_id is not None and len(source_id) < 36:
+        source_id = None
     asset = Entity.create(
         project_id=project_id,
         entity_type_id=asset_type_id,
