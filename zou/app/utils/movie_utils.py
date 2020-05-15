@@ -114,10 +114,6 @@ def build_playlist_movie(
             (width, height) = get_movie_size(first_movie_file_path)
 
         for tmp_file_path, file_name in tmp_file_paths:
-            if not has_soundtrack(tmp_file_path):
-                add_empty_soundtrack(tmp_file_path)
-
-        for tmp_file_path, file_name in tmp_file_paths:
             in_file = ffmpeg.input(tmp_file_path)
             in_files.append(
                 in_file["v"]
