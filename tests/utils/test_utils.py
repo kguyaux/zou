@@ -118,6 +118,8 @@ class UtilsTestCase(unittest.TestCase):
         result = movie_utils.build_playlist_movie(tmp_file_paths, movie_file_path)
         self.assertTrue(result['success'])
         self.assertTrue(os.path.exists(movie_file_path))
+        self.assertTrue(movie_utils.has_soundtrack(movie_file_path))
+        os.unlink(movie_file_path)
 
 
     def test_normalize_movie(self):
@@ -128,11 +130,17 @@ class UtilsTestCase(unittest.TestCase):
         shutil.copyfile(file_path, testfile)
         result = movie_utils.normalize_movie(testfile)
         self.assertTrue(movie_utils.has_soundtrack(result))
+        os.unlink(testfile)
+        os.unlink(result)
 
 
     def test_audiosync(self):
-        #test if the audio is in sync, like the original
+        """Under construction:
+        test if the audio is in sync, like the original
+        """
+
         testfile = 'tests/test_data/wiaf_footage_original.mov'
         result = movie_utils.normalize_movie(testfile)
         self.assertTrue(movie_utils.has_soundtrack(result))
+        os.unlink(result)
         
