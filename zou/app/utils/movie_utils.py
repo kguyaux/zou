@@ -67,8 +67,12 @@ def normalize_movie(movie_path, fps="24.00", width=None, height=1080):
         width = width + 1
 
     try:
-        stream = ffmpeg.input(movie_path)
-        stream = stream.output(
+        streams = []
+        streams.append(ffmpeg.input(movie_path))
+        if not has_soundtrack(movie_path):
+            streams.append(ffmpeg.input('anullsrc', format='lavfi', t=0.01))
+        result = ffmpeg.output(
+            *streams,
             file_target_path,
             pix_fmt="yuv420p",
             format="mp4",
@@ -78,9 +82,7 @@ def normalize_movie(movie_path, fps="24.00", width=None, height=1080):
             vcodec="libx264",
             s="%sx%s" % (width, height),
         )
-        stream.run(quiet=False, capture_stderr=True)
-        if not has_soundtrack(file_target_path):
-            add_empty_soundtrack(file_target_path)
+        result.overwrite_output().run(quiet=False, capture_stderr=True)
     except ffmpeg.Error as exc:
         from flask import current_app
 
@@ -90,16 +92,9 @@ def normalize_movie(movie_path, fps="24.00", width=None, height=1080):
     return file_target_path
 
 
-def _HasAudioStreams(file_path):
-    """
-    This handy function that returns True if an audiotrack is found, was found at:
-    https://github.com/kkroening/ffmpeg-python/issues/204#issuecomment-593448324
-    """
-    streams = ffmpeg.probe(file_path)["streams"]
-    for stream in streams:
-        if stream["codec_type"] == "audio":
-            return True
-    return False
+def has_soundtrack(file_path):
+    audio = ffmpeg.probe(file_path, select_streams='a')
+    return bool(audio["streams"])
 
 
 def build_playlist_movie(
@@ -120,7 +115,7 @@ def build_playlist_movie(
                 .filter("setsar", "1/1")
                 .filter("scale", width, height)
             )
-            if not _HasAudioStreams(tmp_file_path):
+            if not has_soundtrack(tmp_file_path):
                 in_file = ffmpeg.input('anullsrc', format='lavfi', t=0.01)
 
             in_files.append(in_file["a"])

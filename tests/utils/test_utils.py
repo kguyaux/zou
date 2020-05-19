@@ -1,4 +1,5 @@
 import os
+import shutil
 import datetime
 import unittest
 import uuid
@@ -119,3 +120,19 @@ class UtilsTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(movie_file_path))
 
 
+    def test_normalize_movie(self):
+        file_path = 'tests/test_data/without_audio.mp4'
+        testfile = 'tests/test_data/normalizetest_111.mp4'
+        if os.path.exists(testfile):
+            os.unlink(testfile)
+        shutil.copyfile(file_path, testfile)
+        result = movie_utils.normalize_movie(testfile)
+        self.assertTrue(movie_utils.has_soundtrack(result))
+
+
+    def test_audiosync(self):
+        #test if the audio is in sync, like the original
+        testfile = 'tests/test_data/wiaf_footage_original.mov'
+        result = movie_utils.normalize_movie(testfile)
+        self.assertTrue(movie_utils.has_soundtrack(result))
+        
