@@ -1043,7 +1043,7 @@ def get_preview_fps(project):
     set.
     """
     fps = "24.00"
-    if project["fps"] is not None:
+    if project["fps"]:
         fps = "%.2f" % float(project["fps"].replace(",", "."))
     return fps
 
